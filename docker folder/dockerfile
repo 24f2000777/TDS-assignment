@@ -1,0 +1,11 @@
+# Use a lightweight Python image
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Copy app (example: just a hello script)
+COPY . /app
+
+# Run a default command
+CMD ["python3", "-c", "print('Hello from 24f2000777 Docker image!')"]
