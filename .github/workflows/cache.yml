@@ -1,0 +1,23 @@
+name: Cache Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: prime-cache-7799caf
+        id: cache-step
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/test
+          key: cache-7799caf
+
+      - name: Echo cache result
+        run: echo "Cache hit? ${{ steps.cache-step.outputs.cache-hit }}"
