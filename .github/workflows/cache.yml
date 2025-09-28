@@ -2,22 +2,29 @@ name: Cache Workflow
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
+      # Create something to cache (a dummy deps dir)
+      - name: Prepare deps
+        run: |
+          mkdir -p .cache-demo
+          echo "hello $(date)" > .cache-demo/primed.txt
+
+      # REQUIRED step & key
       - name: prime-cache-7799caf
-        id: cache-step
+        id: cache
         uses: actions/cache@v4
         with:
-          path: ~/.cache/test
+          path: .cache-demo
           key: cache-7799caf
 
+      # Echo whether cache was a hit or miss
       - name: Echo cache result
-        run: echo "Cache hit? ${{ steps.cache-step.outputs.cache-hit }}"
+        run: echo "cache-hit=${{ steps.cache.outputs.cache-hit }}"
