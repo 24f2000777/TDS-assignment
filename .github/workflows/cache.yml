@@ -6,33 +6,32 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  cache-job:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+      # Create a directory we will cache (no language runtime needed)
+      - name: Prepare cache dir
+        run: |
+          mkdir -p .ci-cache/demo
+          echo "seed-$(date +%s)" > .ci-cache/demo/seed.txt
 
-      # 1) Cache step: primes/restores ~/.npm with the fixed key
-      - name: Cache npm cache dir
+      # The required cache step
+      - name: Cache demo dir
         id: deps-cache
         uses: actions/cache@v4
         with:
-          path: ~/.npm
+          path: .ci-cache
           key: cache-7799caf
 
-      # 2) REQUIRED by the prompt: echo whether cache hit or miss
+      # The required echo step
       - name: prime-cache-7799caf
-        run: echo "cache-hit: ${{ steps.deps-cache.outputs.cache-hit }}"
+        run: echo "cache-hit: ${{ steps.deps-cache.outputs['cache-hit'] }}"
 
-      # 3) Install deps (this populates ~/.npm; on a miss, cache is saved after job)
-      - name: Install deps
-        run: npm ci
-
-      - name: Build (example)
-        run: npm run build --if-present
+      # Prove job keeps running and succeeds
+      - name: Finish
+        run: |
+          echo "Cached files:"
+          ls -la .ci-cache || true
