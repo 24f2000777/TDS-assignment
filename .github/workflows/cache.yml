@@ -1,3 +1,4 @@
+# .github/workflows/cache.yml
 name: CI with cache
 
 on:
@@ -12,13 +13,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Create a directory we will cache (no language runtime needed)
       - name: Prepare cache dir
         run: |
           mkdir -p .ci-cache/demo
           echo "seed-$(date +%s)" > .ci-cache/demo/seed.txt
 
-      # The required cache step
+      # IMPORTANT: id must be "deps-cache" so we can read outputs below
       - name: Cache demo dir
         id: deps-cache
         uses: actions/cache@v4
@@ -26,11 +26,10 @@ jobs:
           path: .ci-cache
           key: cache-7799caf
 
-      # The required echo step
+      # IMPORTANT: name must be EXACTLY prime-cache-7799caf
       - name: prime-cache-7799caf
-        run: echo "cache-hit: ${{ steps.deps-cache.outputs['cache-hit'] }}"
+        run: echo "cache-hit: ${{ steps.deps-cache.outputs.cache-hit }}"
 
-      # Prove job keeps running and succeeds
       - name: Finish
         run: |
           echo "Cached files:"
